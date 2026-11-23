@@ -1,0 +1,28 @@
+# >>> unity-ai-studio >>>  (managed by the studio kit; edits inside this block are replaced on update)
+.claude/settings.local.json
+CLAUDE.local.md
+project.local.yaml
+production/session-logs/
+production/session-state/
+.scratch/
+.claude/agent-memory/
+.claude/worktrees/
+.studio-backup/
+docs/consistency-failures.md
+__pycache__/
+*.pyc
+node_modules/
+
+# Test output (Unity -testResults)
+/reports/
+/test-results/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+credentials.json
+secrets.json
+# <<< unity-ai-studio <<<

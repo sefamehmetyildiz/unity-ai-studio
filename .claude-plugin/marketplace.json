@@ -1,0 +1,15 @@
+{
+  "name": "unity-ai-studio",
+  "owner": { "name": "Sefa Mehmet Yıldız" },
+  "metadata": {
+    "description": "Personal Claude Code plugins by Sefa Mehmet Yıldız"
+  },
+  "plugins": [
+    {
+      "name": "studio",
+      "source": "./",
+      "description": "Unity AI Studio kit: /studio:add, /studio:doctor, /studio:update",
+      "version": "1.1.0"
+    }
+  ]
+}
