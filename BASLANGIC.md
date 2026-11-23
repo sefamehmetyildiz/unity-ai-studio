@@ -1,7 +1,8 @@
 # Unity AI Studio: Sıfırdan Kurulum ve Kullanım
 
-Bu rehber Windows içindir ve hiç deneyimi olmayan birine göre yazıldı. Kurulum
-yaklaşık 20–30 dakika sürer ve büyük kısmı beklemedir.
+Bu rehber **Windows** ve **macOS** içindir ve hiç deneyimi olmayan birine göre
+yazıldı. İki sistemde farklı olan adımlar ayrı ayrı yazıldı; gerisi aynıdır.
+Kurulum yaklaşık 20–30 dakika sürer ve büyük kısmı beklemedir.
 
 ---
 
@@ -9,7 +10,7 @@ yaklaşık 20–30 dakika sürer ve büyük kısmı beklemedir.
 
 | Gereken | Nereden |
 |---|---|
-| Windows 10 veya 11 | — |
+| Windows 10/11 ya da macOS | — |
 | **Ücretli bir Claude hesabı** (Pro, Max veya Team) | [claude.ai](https://claude.ai) |
 | **Unity Hub** ve en az bir **Unity 6** sürümü | [unity.com/download](https://unity.com/download). Hub üzerinden **6.3 LTS** kurulması önerilir |
 | İnternet bağlantısı | — |
@@ -21,28 +22,44 @@ bunları kendisi kuruyor.
 
 ## Bölüm 1: Bilgisayarı hazırlamak (her bilgisayarda bir kez)
 
-**1. PowerShell'i aç.** Başlat menüsüne `PowerShell` yaz ve **Windows
-PowerShell**'e tıkla. Mavi ya da siyah bir pencere açılır.
+**1. Terminali aç.**
 
-**2. Şu satırı kopyala, pencereye yapıştır** (sağ tık yapıştırır) ve Enter'a bas:
+- **Windows:** Başlat menüsüne `PowerShell` yaz ve **Windows PowerShell**'e
+  tıkla. Mavi ya da siyah bir pencere açılır.
+- **macOS:** `Cmd + Boşluk` ile Spotlight'ı aç, `Terminal` yaz ve Enter'a bas.
+
+Bu rehberde bundan sonra "terminal" dendiğinde bu pencere kastediliyor.
+
+**2. Sistemine uygun satırı kopyala, terminale yapıştır ve Enter'a bas.**
+Windows'ta sağ tık, macOS'ta `Cmd + V` yapıştırır.
+
+Windows:
 
 ```powershell
 irm https://raw.githubusercontent.com/sefamehmetyildiz/unity-ai-studio/main/setup-machine.ps1 | iex
+```
+
+macOS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sefamehmetyildiz/unity-ai-studio/main/setup-machine.sh | bash
 ```
 
 **3. Bitmesini bekle.** Script her adım için bir satır yazar:
 
 - `[OK]` o adımın hazır olduğunu gösterir.
 - `[DO]` bir şeyin kurulduğunu gösterir.
-- Git kurulurken Windows izin isteyebilir, **Evet** de.
+- **Windows:** Git kurulurken Windows izin isteyebilir, **Evet** de.
+- **macOS:** Git yüklü değilse "Command Line Tools" kurulum penceresi açılır.
+  **Yükle**'ye bas, kurulum bitince 2. adımdaki satırı bir kez daha çalıştır.
 - En sonda yeşil renkte **"Machine ready."** yazısını görmelisin.
 
-**4. PowerShell penceresini kapat, yenisini aç.** Bu adım şart. Yeni kurulan
+**4. Terminal penceresini kapat, yenisini aç.** Bu adım şart. Yeni kurulan
 komutlar ancak yeni açılan pencerede tanınır.
 
 **5. Claude'a bir kez giriş yap.** Yeni pencerede şunu yaz:
 
-```powershell
+```
 claude
 ```
 
@@ -55,16 +72,26 @@ Tarayıcı açılır, Claude hesabınla giriş yaparsın. Giriş bitince pencere
 
 **6. Unity projesini oluştur ya da aç.** Unity Hub'da **New project** seçip bir
 şablon seç (2D veya 3D, URP olanlar önerilir). Projeye bir isim ver ve **klasör
-yolunu not et**, örneğin `C:\Oyunlar\IlkOyunum`. Proje Unity'de açılsın ve
-**açık kalsın**.
+yolunu not et**: Windows'ta örneğin `C:\Oyunlar\IlkOyunum`, macOS'ta
+`~/Oyunlar/IlkOyunum`. Proje Unity'de açılsın ve **açık kalsın**.
 
-**7. PowerShell'de proje klasörüne gir ve Claude'u başlat:**
+**7. Terminalde proje klasörüne gir ve Claude'u başlat.**
+
+Windows:
 
 ```powershell
 cd "C:\Oyunlar\IlkOyunum"
 ```
 
-```powershell
+macOS:
+
+```bash
+cd ~/Oyunlar/IlkOyunum
+```
+
+Sonra her iki sistemde:
+
+```
 claude
 ```
 
@@ -118,7 +145,7 @@ Bir tablo çıkar:
 Her çalışma oturumunda şunları yap:
 
 1. Unity'de projeni aç.
-2. PowerShell'de proje klasörüne gir (`cd ...`) ve `claude` yaz.
+2. Terminalde proje klasörüne gir (`cd ...`) ve `claude` yaz.
 3. Claude'la **Türkçe, normal bir dille** konuş.
 
 **İlk oyununa başlamak için iki yol var:**
@@ -162,10 +189,11 @@ ekle" gibi normal cümleler de çalışır.
 
 | Sorun | Çözüm |
 |---|---|
-| `claude` yazınca "tanınmıyor" hatası | PowerShell'i kapatıp yeniden aç. Hata sürerse 1. bölümdeki kurulum satırını tekrar çalıştır; kurulu olanları atlar. |
+| `claude` yazınca "tanınmıyor" ya da "command not found" hatası | Terminali kapatıp yeniden aç. Hata sürerse 1. bölümdeki kurulum satırını tekrar çalıştır; kurulu olanları atlar. |
 | Doctor "No connected Editor" diyor | Projeyi Unity'de aç ve Unity penceresine bir kez tıkla. |
 | `/studio:add` komutu bulunamıyor | Kurulum satırını tekrar çalıştır, sonra Claude'u yeniden başlat. |
-| "Script çalıştırılamıyor" hatası | Kurulum komutunu Windows PowerShell'de çalıştırdığından emin ol. Komut İstemi'nde (cmd) çalışmaz. |
+| Windows: "Script çalıştırılamıyor" hatası | Kurulum komutunu Windows PowerShell'de çalıştırdığından emin ol. Komut İstemi'nde (cmd) çalışmaz. |
+| macOS: kurulum "Command Line Tools" penceresinde kaldı | Penceredeki kurulumu bitir, sonra kurulum satırını tekrar çalıştır. |
 | Herhangi bir şey | Claude'a sorunu olduğu gibi yaz ya da `/studio:doctor` çalıştır. |
 
 ---

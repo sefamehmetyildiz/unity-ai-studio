@@ -81,7 +81,7 @@ else { Report 'MISSING' ("Unity CLI skills missing: {0} -> unity setup claude -y
 
 $cfg = Read-JsonDict (Join-Path $env:USERPROFILE '.claude.json')
 if ($null -eq $cfg) { Report 'WARN' 'Could not read ~/.claude.json (the MCP check below may be wrong)' }
-if ($null -ne (Get-JsonPath $cfg @('mcpServers', 'unity-editor-mcp'))) { Report 'OK' 'MCP server unity-editor-mcp (user scope)' }
+if ($null -ne (Get-JsonPath $cfg @('mcpServers', 'unity-editor-mcp'))) { Report 'OK' 'MCP server unity-editor-mcp' }
 else { Report 'MISSING' 'MCP server unity-editor-mcp not configured -> unity mcp configure claude -y' }
 if ($null -ne (Get-JsonPath $cfg @('mcpServers', 'unity-mcp'))) {
     Report 'WARN' 'Legacy MCP server unity-mcp (old AI Assistant relay) still configured -> claude mcp remove unity-mcp -s user'

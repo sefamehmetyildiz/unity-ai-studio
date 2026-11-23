@@ -5,9 +5,10 @@ and his alone. Do not add any company, studio, team or client name to it, or
 the name of a project that uses it. The kit is a Claude Code plugin and
 marketplace that installs a ready-made AI game-dev environment into
 any Unity project. The environment is Claude Code Game Studios (CCGS) wired to
-the gamedev skills and Unity's official plugin, CLI and Editor MCP. Users
-install it with `setup-machine.ps1` once per machine, then `/studio:add` per
-project. See `README.md` (user docs) and `BASLANGIC.md` (beginner guide).
+the gamedev skills and Unity's official plugin, CLI and Editor MCP. It runs on
+**Windows and macOS** (the bash scripts also run on Linux). Users install it
+with `setup-machine.ps1` (Windows) or `setup-machine.sh` (macOS) once per
+machine, then `/studio:add` per project. See `README.md` (user docs) and `BASLANGIC.md` (beginner guide).
 
 **Talk to the user in Turkish.** Code, comments, commit messages and script
 output stay in English.
@@ -28,10 +29,10 @@ tables. Only this file governs work in this repo.
 .claude-plugin/plugin.json       plugin "studio"  (repo root = plugin root)
 .claude-plugin/marketplace.json  marketplace "unity-ai-studio", source "./"
 skills/{add,doctor,update}/SKILL.md   /studio:add, /studio:doctor, /studio:update
-setup-machine.ps1                one-time machine setup (self-contained)
-scripts/common.ps1               shared helpers (dot-sourced)
-scripts/add-to-project.ps1       install / -Update into a Unity project
-scripts/doctor.ps1               machine + project + live Editor checks
+setup-machine.ps1 / .sh          one-time machine setup, Windows / macOS (self-contained)
+scripts/common.ps1 / .sh         shared helpers (dot-sourced / sourced)
+scripts/add-to-project.ps1 / .sh install / update into a Unity project
+scripts/doctor.ps1 / .sh         machine + project + live Editor checks
 templates/unity.gitignore        base Unity .gitignore (used when a project has none)
 templates/studio.gitignore       kit block, between >>> / <<< unity-ai-studio markers
 templates/studio.gitattributes   kit block, same markers
@@ -89,11 +90,29 @@ a fallback, "two folders above the skill's base directory".
    `claude plugin marketplace update unity-ai-studio` and
    `claude plugin update studio@unity-ai-studio`.
 9. **Never commit or push without the user's explicit OK.**
+10. **Windows and macOS scripts stay in parity.** Every `.ps1` in the kit has a
+    `.sh` twin with the same behaviour, checks, messages and exit codes. A
+    change to one is a change to both, tested on both paths. Both write the
+    same `.claude/studio-kit.json` fields. A team may mix OSes on one project,
+    so each script must read the other's stamp. The PowerShell writer lays the
+    `files` array out across lines with wide indentation;
+    `stamp_files` in common.sh parses either layout.
+11. **The bash scripts target macOS's bash 3.2 and BSD tools.** Do not use
+    associative arrays, `mapfile`/`readarray`, `${var,,}`, `sed -i`,
+    `readlink -f`, `grep -P`, `find -printf`, `date -I` or `&>>`. Use
+    `mktemp "${TMPDIR:-/tmp}/name.XXXXXX"`. `setup-machine.sh` wraps everything
+    in `main()` so that `curl | bash` reads the whole script before running
+    it. Child commands get `</dev/null` so they cannot eat the piped script.
+    `.sh` files must stay LF (`.gitattributes`) and executable (git mode 755).
+    On Windows, `setup-machine.sh` refuses to run unless `STUDIO_FORCE_POSIX=1`
+    is set, which is a test hook.
 
-## add-to-project.ps1 contract
+## add-to-project contract (.ps1 and .sh)
 
 - Flags: `-ProjectPath` (default: current folder), `-Update`, `-Force` (also
-  install into a non-Unity folder), `-SkipPackage`, `-DryRun`.
+  install into a non-Unity folder), `-SkipPackage`, `-DryRun`. The `.sh`
+  spells them `--project-path`, `--update`, `--force`, `--skip-package`,
+  `--dry-run`, and also accepts the PowerShell spellings.
 - Exit codes: `0` ok, `2` not a Unity project, `3` already installed (use
   `-Update`).
 - A Unity project is a folder with `Assets/` and
@@ -136,12 +155,13 @@ changes:
 Plugin-namespaced names in agent `skills:` frontmatter work: preloading was
 verified by having an agent quote the skill headings.
 
-## External pieces setup-machine.ps1 relies on
+## External pieces the setup scripts rely on
 
 | Piece | How it is installed |
 |---|---|
-| Claude Code | `irm https://claude.ai/install.ps1 \| iex`, installs to `~/.local/bin`, which the script adds to the user PATH |
-| Unity CLI | `$env:UNITY_CLI_CHANNEL='beta'; irm https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.ps1 \| iex`, installs to `%LOCALAPPDATA%\Unity\bin` |
+| Git | Windows: `winget install Git.Git`. macOS: `xcode-select --install` (opens a GUI dialog; the script asks the user to re-run once it finishes) |
+| Claude Code | Windows: `irm https://claude.ai/install.ps1 \| iex`. macOS: `curl -fsSL https://claude.ai/install.sh \| bash`. Both install to `~/.local/bin`. The Windows script adds it to the user PATH; on macOS, `claude install` sets up shell integration |
+| Unity CLI | Windows: `$env:UNITY_CLI_CHANNEL='beta'; irm https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.ps1 \| iex`, installs to `%LOCALAPPDATA%\Unity\bin`. macOS: `curl -fsSL .../install.sh \| UNITY_CLI_CHANNEL=beta bash`, installs to `~/.unity/bin` and edits `~/.zshrc`. On Linux it installs to `~/.local/bin` |
 | `gamedev@awesome-gamedev-agent-skills` | `claude plugin marketplace add gamedev-skills/awesome-gamedev-agent-skills` + `claude plugin install ... --scope user` |
 | `unity@unity-agent-plugin` + Unity CLI skills in `~/.claude/skills` | `unity setup claude -y` |
 | MCP `unity-editor-mcp` | `unity mcp configure claude -y --replace-legacy`, fallback `claude mcp add --scope user unity-editor-mcp -- <unity.exe> mcp --tool-groups` |
@@ -159,9 +179,11 @@ doctor:
 
 Run this before every commit that touches scripts or the payload.
 
-1. **Parse check** in PS 5.1: run `powershell.exe -NoProfile -File <script>`,
-   or use `[System.Management.Automation.Language.Parser]::ParseFile` on each
-   `.ps1`.
+1. **Parse check.**
+   - PS 5.1: run `powershell.exe -NoProfile -File <script>`, or use
+     `[System.Management.Automation.Language.Parser]::ParseFile` on each `.ps1`.
+   - bash: `bash -n` on each `.sh`, and grep for the constructs banned by rule
+     11.
 2. **Scratch Unity project.** Create it in a temp/scratchpad folder, never
    inside this repo:
    - `ProjectSettings/` copied from any real Unity project.
@@ -188,13 +210,25 @@ Run this before every commit that touches scripts or the payload.
 6. **`setup-machine.ps1 -DryRun`.** To test the `iex` path without changing
    the machine, pipe a copy whose `$DryRun` switch defaults to `$true` into
    `Invoke-Expression`.
+7. **The bash twins.** Run steps 3 and 4 again with `add-to-project.sh` /
+   `doctor.sh`; on Windows, Git Bash works. Then cross-check the stamps:
+   - `.ps1 -Update` on a project installed by `.sh`.
+   - `.sh --update` on a project installed by `.ps1`.
+
+   Both must report "0 added, 0 updated" and keep `installedAt`. Test
+   `setup-machine.sh` with `STUDIO_FORCE_POSIX=1 bash setup-machine.sh --dry-run`,
+   and the piped path with
+   `cat setup-machine.sh | STUDIO_FORCE_POSIX=1 bash -s -- --dry-run`.
 
 Note: in auto mode, Claude is not allowed to run `irm <remote> | iex` itself.
 Run the local file instead, or let the user run the one-liner.
 
 ## Known gaps / ideas
 
-- Windows only. There is no macOS/Linux `setup-machine.sh` yet.
+- The macOS scripts were written for bash 3.2 and BSD tools and tested in Git
+  Bash on Windows, which runs bash 5 with GNU tools. They have **not yet been
+  run on a real Mac**. The first macOS user should run `/studio:doctor` and
+  report any issue.
 - No plugin icon (`.claude-plugin/icon.png`, 512–2048 px square PNG).
 - The gamedev skills and CCGS engine docs target Unity 6.3 LTS. The doctor
   warns on older editors.

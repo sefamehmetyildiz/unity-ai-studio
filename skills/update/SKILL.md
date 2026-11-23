@@ -30,18 +30,20 @@ Below, `<kit>` means that folder.
    updated, tell the user to restart Claude Code and run `/studio:update` again
    (this session still runs the old kit files).
 
-2. **Dry run.** Target is the argument or the current folder:
+2. **Dry run.** Target is the argument or the current folder. Use the script
+   for this OS:
 
-   ```
-   powershell -NoProfile -ExecutionPolicy Bypass -File "<kit>/scripts/add-to-project.ps1" -ProjectPath "<target>" -Update -DryRun
-   ```
+   | | Windows | macOS / Linux |
+   |---|---|---|
+   | Dry run | `powershell -NoProfile -ExecutionPolicy Bypass -File "<kit>/scripts/add-to-project.ps1" -ProjectPath "<target>" -Update -DryRun` | `bash "<kit>/scripts/add-to-project.sh" --project-path "<target>" --update --dry-run` |
 
    Summarize: files added / updated / removed, files kept as the project's own.
    If framework files the user may have edited on purpose will be replaced,
    name them.
 
 3. **Ask, then update.** Ask "May I update the studio in `<target>`?" and wait
-   for a yes. Run the same command without `-DryRun`.
+   for a yes. Run the same command without the dry-run option (`-DryRun` /
+   `--dry-run`).
 
 4. **Finish.** Run `/studio:doctor` for the target. Tell the user to restart
    Claude Code in the project so the new agents, hooks and rules load. Do not

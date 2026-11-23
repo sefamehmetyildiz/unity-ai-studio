@@ -181,9 +181,11 @@ Lists payload files as forward-slash paths relative to the payload root.
 #>
 function Get-PayloadFiles {
     $root = (Resolve-Path $script:PayloadRoot).Path
-    Get-ChildItem -LiteralPath $root -Recurse -File -Force | ForEach-Object {
-        $_.FullName.Substring($root.Length).TrimStart('\', '/') -replace '\\', '/'
-    } | Sort-Object
+    # Finder metadata (.DS_Store, ._*) is never part of the payload.
+    Get-ChildItem -LiteralPath $root -Recurse -File -Force |
+        Where-Object { $_.Name -ne '.DS_Store' -and -not $_.Name.StartsWith('._') } |
+        ForEach-Object { $_.FullName.Substring($root.Length).TrimStart('\', '/') -replace '\\', '/' } |
+        Sort-Object
 }
 
 <#

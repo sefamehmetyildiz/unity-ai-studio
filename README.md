@@ -21,8 +21,10 @@ yönlendirme kuralları, Unity agent'larına önceden yüklenen skill'ler ve
 
 ## 1. Bilgisayar kurulumu (her bilgisayarda bir kez)
 
-Gerekenler: Windows 10/11, Unity Hub ve en az bir Unity 6 sürümü, bir Claude
-hesabı (Pro/Max/Team).
+Gerekenler: **Windows 10/11 veya macOS**, Unity Hub ve en az bir Unity 6
+sürümü, bir Claude hesabı (Pro/Max/Team).
+
+### Windows
 
 PowerShell'i aç ve şunu yapıştır:
 
@@ -30,20 +32,40 @@ PowerShell'i aç ve şunu yapıştır:
 irm https://raw.githubusercontent.com/sefamehmetyildiz/unity-ai-studio/main/setup-machine.ps1 | iex
 ```
 
-Script indirmeden önce içeriğini görmek istersen (önerilir), repoyu klonlayıp
-yerelden de çalıştırabilirsin:
+### macOS
 
-```powershell
-git clone https://github.com/sefamehmetyildiz/unity-ai-studio.git "$HOME\unity-ai-studio"
+Terminal'i aç ve şunu yapıştır:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sefamehmetyildiz/unity-ai-studio/main/setup-machine.sh | bash
 ```
+
+Git yüklü değilse macOS bir "Command Line Tools" kurulum penceresi açar. Kurulum
+bitince aynı komutu bir kez daha çalıştır.
+
+### Script'i önce okumak istersen (önerilir)
+
+Repoyu klonlayıp yerelden de çalıştırabilirsin:
+
+```bash
+git clone https://github.com/sefamehmetyildiz/unity-ai-studio.git ~/unity-ai-studio
+```
+
+Windows'ta:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\unity-ai-studio\setup-machine.ps1"
 ```
 
+macOS'ta:
+
+```bash
+bash ~/unity-ai-studio/setup-machine.sh
+```
+
 Script kurulu olanları atlar, eksikleri kurar:
 
-1. Git Bash (Game Studios hook'ları için)
+1. Git (Windows'ta Git Bash, macOS'ta Command Line Tools; Game Studios hook'ları için)
 2. Claude Code CLI (PATH'e ekler)
 3. Unity CLI
 4. `gamedev` plugin'i
@@ -51,8 +73,9 @@ Script kurulu olanları atlar, eksikleri kurar:
 6. `unity-editor-mcp` sunucusu
 7. Bu kit'in `studio` plugin'i
 
-Ne yapacağını önceden görmek için sonuna `-DryRun` ekleyebilirsin. Bittiğinde
-**yeni bir terminal aç** ve ilk kez `claude` yazarak giriş yap.
+Ne yapacağını önceden görmek için sonuna Windows'ta `-DryRun`, macOS'ta
+`--dry-run` ekleyebilirsin. Bittiğinde **yeni bir terminal aç** ve ilk kez
+`claude` yazarak giriş yap.
 
 ## 2. Bir Unity projesine ekleme (her projede bir kez)
 
@@ -67,6 +90,10 @@ Claude kullanmadan da yapılabilir:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\unity-ai-studio\scripts\add-to-project.ps1" -ProjectPath "C:\Oyunlar\YeniOyun"
+```
+
+```bash
+bash ~/unity-ai-studio/scripts/add-to-project.sh --project-path ~/Oyunlar/YeniOyun
 ```
 
 Ardından:
@@ -103,11 +130,11 @@ Sık kullanılan Game Studios komutları: `/start`, `/prototype`, `/next-step`,
 
 Kit'in yeni sürümünü almak için:
 
-```powershell
+```bash
 claude plugin marketplace update unity-ai-studio
 ```
 
-```powershell
+```bash
 claude plugin update studio@unity-ai-studio
 ```
 
@@ -130,9 +157,9 @@ Sonra her projede `/studio:update` çalıştır.
 ```
 payload/      Projeye kopyalanan dosyalar (Game Studios + entegrasyon katmanı)
 templates/    .gitignore / .gitattributes blokları
-scripts/      add-to-project.ps1, doctor.ps1, common.ps1
+scripts/      add-to-project, doctor, common: .ps1 (Windows) ve .sh (macOS/Linux)
 skills/       /studio:add, /studio:doctor, /studio:update
-setup-machine.ps1
+setup-machine.ps1 / setup-machine.sh
 .claude-plugin/   plugin.json + marketplace.json (repo hem plugin hem marketplace)
 VERSION       Kit sürümü. plugin.json ve marketplace.json içindeki version ile aynı tutulur.
 ```
@@ -153,8 +180,9 @@ gamedev ve Unity plugin'leri kit'e dahil değildir; kendi kaynaklarından kurulu
 
 ---
 
-**English summary:** a one-command Claude Code environment for Unity. Run
-`setup-machine.ps1` once per machine, then `/studio:add` in any Unity project,
+**English summary:** a one-command Claude Code environment for Unity on Windows
+and macOS. Run `setup-machine.ps1` (Windows) or `setup-machine.sh` (macOS) once
+per machine, then `/studio:add` in any Unity project,
 `/setup-engine unity`, and `/studio:doctor`. It bundles Claude Code Game
 Studios with wiring to the gamedev skills and Unity's official plugin, CLI and
 Editor MCP.

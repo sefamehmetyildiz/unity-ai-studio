@@ -16,11 +16,12 @@ Below, `<kit>` means that folder.
    Unity project (no `Assets/` + `ProjectSettings/ProjectVersion.txt`), means
    machine only. Otherwise the target is the argument path or the current folder.
 
-2. **Run** (machine only adds `-MachineOnly`):
+2. **Run** the script for this OS:
 
-   ```
-   powershell -NoProfile -ExecutionPolicy Bypass -File "<kit>/scripts/doctor.ps1" -ProjectPath "<target>"
-   ```
+   | | Windows | macOS / Linux |
+   |---|---|---|
+   | Project | `powershell -NoProfile -ExecutionPolicy Bypass -File "<kit>/scripts/doctor.ps1" -ProjectPath "<target>"` | `bash "<kit>/scripts/doctor.sh" --project-path "<target>"` |
+   | Machine only | add `-MachineOnly` | add `--machine-only` |
 
    It prints one line per check: `OK`, `WARN`, `MISSING` or `FAIL`, each with
    the fix. It changes nothing except asking a connected Editor to recompile.
@@ -32,7 +33,8 @@ Below, `<kit>` means that folder.
    - kit files, rules, agent bridge, `.gitignore`: `/studio:update`
    - package: `unity pipeline install --project-path "<target>"`
    - MCP: `unity mcp configure claude -y`
-   - plugins / CLIs: `powershell -NoProfile -ExecutionPolicy Bypass -File "<kit>/setup-machine.ps1"`
+   - plugins / CLIs: on Windows `powershell -NoProfile -ExecutionPolicy Bypass -File "<kit>/setup-machine.ps1"`,
+     on macOS / Linux `bash "<kit>/setup-machine.sh"`
    - engine not set: the user runs `/setup-engine unity` (it asks them questions)
 
    Some fixes are the user's own: opening the project in Unity, upgrading the

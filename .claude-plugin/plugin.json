@@ -1,7 +1,7 @@
 {
   "name": "studio",
-  "version": "1.1.0",
-  "description": "Unity AI Studio: installs, checks and updates the Claude Code Game Studios + gamedev + Unity setup in any Unity project.",
+  "version": "1.2.0",
+  "description": "Unity AI Studio: installs, checks and updates the Claude Code Game Studios + gamedev + Unity setup in any Unity project, on Windows and macOS.",
   "author": { "name": "Sefa Mehmet Yıldız" },
   "homepage": "https://github.com/sefamehmetyildiz/unity-ai-studio",
   "repository": "https://github.com/sefamehmetyildiz/unity-ai-studio",
